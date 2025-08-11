@@ -20,7 +20,7 @@
       display: block;
       margin-top: 12px;
     }
-    input, select, textarea {
+    input, select {
       width: 100%;
       padding: 8px;
       margin-top: 4px;
@@ -28,6 +28,17 @@
       color: #e6edf3;
       border: 1px solid #30363d;
       border-radius: 4px;
+    }
+    .checkbox-group {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 4px;
+      padding: 8px;
+      margin-top: 4px;
+    }
+    .checkbox-group label {
+      display: block;
+      margin: 4px 0;
     }
     button {
       margin-top: 20px;
@@ -56,7 +67,7 @@
   <label>Roblox Username:</label>
   <input type="text" id="username" placeholder="Exact Roblox username">
 
-  <label>Rank:</label>
+  <label>Rank (LR/MR/HR/HC/FL):</label>
   <select id="rank">
     <option value="LR">LR</option>
     <option value="MR">MR</option>
@@ -66,18 +77,49 @@
   </select>
 
   <label>Serial ID:</label>
-  <input type="text" id="serialId" placeholder="e.g. 1234">
+  <input type="text" id="serialId" placeholder="e.g. 001">
 
   <label>Codename:</label>
-  <input type="text" id="codename" placeholder="e.g. Chop">
+  <input type="text" id="codename" placeholder="e.g. Sentinel">
 
-  <label>Full Rank (for permrtag):</label>
-  <input type="text" id="fullRank" placeholder="e.g. Logistics Operator">
+  <label>Full Rank:</label>
+  <select id="fullRank">
+    <option>Director of Logistics</option>
+    <option>Deputy Director of Logistics</option>
+    <option>Maintenance Supervisor</option>
+    <option>System Specialist</option>
+    <option>Logistics Coordinator</option>
+    <option>Logistics Operator</option>
+    <option>Field Mechanic</option>
+    <option>Senior Technician</option>
+    <option>Technician</option>
+    <option>Junior Technician</option>
+    <option>Trainee Technician</option>
+  </select>
 
-  <label>Tools (comma separated):</label>
-  <input type="text" id="tools" placeholder="e.g. Glock 17, L3 Keycard, Radio, Wrench">
+  <label>Tools:</label>
+  <div class="checkbox-group" id="tools">
+    <label><input type="checkbox" value="Glock17"> Glock 17</label>
+    <label><input type="checkbox" value="L3Keycard"> L3 Keycard</label>
+    <label><input type="checkbox" value="Radio"> Radio</label>
+    <label><input type="checkbox" value="Medkit5red"> Medkit 5 red</label>
+    <label><input type="checkbox" value="Wrench"> Wrench</label>
+    <hr>
+    <strong>Medical Certification:</strong>
+    <label><input type="checkbox" value="Medkit10red"> Medkit 10 red</label>
+    <label><input type="checkbox" value="Medkit10blue"> Medkit 10 blue</label>
+    <label><input type="checkbox" value="Medkit10white"> Medkit 10 white</label>
+    <label><input type="checkbox" value="Medkit10black"> Medkit 10 black</label>
+    <label><input type="checkbox" value="TraumaShears"> Trauma Shears</label>
+    <label><input type="checkbox" value="EMFReader"> EMF Reader</label>
+    <label><input type="checkbox" value="Clipboard"> Clipboard</label>
+    <hr>
+    <strong>Janitorial Certification:</strong>
+    <label><input type="checkbox" value="Broom"> Broom</label>
+    <label><input type="checkbox" value="Spray"> Spray</label>
+  </div>
 
-  <label>Face ID (use 144075659 if unsure):</label>
+  <label>Face ID:</label>
   <input type="text" id="faceId" placeholder="Roblox face asset ID">
 
   <button onclick="generateCommand()">Generate Morph Command</button>
@@ -91,7 +133,7 @@
       MR: "12813781831",
       HR: "12813815111",
       HC: "12813811334",
-      FL: "12813811334" // Using HC armband for FL if needed
+      FL: "12813811334"
     };
 
     function generateCommand() {
@@ -99,18 +141,22 @@
       const rank = document.getElementById("rank").value;
       const serialId = document.getElementById("serialId").value.trim();
       const codename = document.getElementById("codename").value.trim();
-      const fullRank = document.getElementById("fullRank").value.trim();
-      const tools = document.getElementById("tools").value.trim();
+      const fullRank = document.getElementById("fullRank").value;
       const faceId = document.getElementById("faceId").value.trim();
 
-      if (!username || !serialId || !codename || !fullRank || !tools || !faceId) {
-        alert("Please fill out all fields.");
+      // Gather selected tools
+      const selectedTools = Array.from(document.querySelectorAll('#tools input:checked'))
+        .map(cb => cb.value)
+        .join(',');
+
+      if (!username || !serialId || !codename || !fullRank || !faceId || !selectedTools) {
+        alert("Please fill out all fields and select at least one tool.");
         return;
       }
 
       const armbandId = armbandIDs[rank];
 
-      const command = `run permmorph ${username} remove & permshirt ${username} 16286681270 & permpants ${username} 7099968120 & permskin ${username} 125 125 125 & permhat ${username} 14438332755,14617421935,14449252277,14449179297,3860251635,14449406347 & permntag ${username} GRI.MODEL-v1.[${rank}].${serialId}:"${codename}" & permrtag ${username} <font face="Jura"><b>[GRI] | <font color="#faa84c">[Maintenance and Logistics Department]</font></b> <br/><b>[${fullRank}]</b></font> & permhat ${username} ${armbandId} & startergear ${username} ${tools} & permmaxhealth ${username} 120 & permface ${username} ${faceId}`;
+      const command = `run permmorph ${username} remove & permshirt ${username} 16286681270 & permpants ${username} 7099968120 & permskin ${username} 125 125 125 & permhat ${username} 14438332755,14617421935,14449252277,14449179297,3860251635,14449406347 & permntag ${username} GRI.MODEL-v1.[${rank}].${serialId}:"${codename}" & permrtag ${username} <font face="Jura"><b>[GRI] | <font color="#faa84c">[Maintenance and Logistics Department]</font></b> <br/><b>[${fullRank}]</b></font> & permhat ${username} ${armbandId} & startergear ${username} ${selectedTools} & permmaxhealth ${username} 120 & permface ${username} ${faceId}`;
 
       document.getElementById("output").textContent = command;
     }
