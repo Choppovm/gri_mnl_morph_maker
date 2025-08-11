@@ -146,60 +146,81 @@
   </footer>
 
   <script>
-    const armbandIDs = {
-      LR: "12813802758",
-      MR: "12813781831",
-      HR: "12813815111",
-      HC: "12813811334",
-      FL: "12813811334"
-    };
+  const armbandIDs = {
+    LR: "12813802758",
+    MR: "12813781831",
+    HR: "12813815111",
+    HC: "12813811334",
+    FL: "12813811334"
+  };
 
-    const medkitKeywords = ["Medkit 5 Red", "Medkit 10 Red", "Medkit 10 Blue", "Medkit 10 White", "Medkit 10 Black"];
+  const medkitKeywords = [
+    "Medkit 5 Red",
+    "Medkit 10 Red",
+    "Medkit 10 Blue",
+    "Medkit 10 White",
+    "Medkit 10 Black"
+  ];
 
-    function generateCommand() {
-      const username = document.getElementById("username").value.trim();
-      const rank = document.getElementById("rank").value;
-      const serialId = document.getElementById("serialId").value.trim();
-      const codename = document.getElementById("codename").value.trim();
-      const fullRank = document.getElementById("fullRank").value;
-      const faceId = document.getElementById("faceId").value.trim();
+  function generateCommand() {
+    const username = document.getElementById("username").value.trim();
+    const rank = document.getElementById("rank").value;
+    const serialId = document.getElementById("serialId").value.trim();
+    const codename = document.getElementById("codename").value.trim();
+    const fullRank = document.getElementById("fullRank").value;
+    const faceId = document.getElementById("faceId").value.trim();
 
-      // Gather selected tools
-      const selectedToolsArray = Array.from(document.querySelectorAll('#tools input:checked'))
-        .map(cb => cb.value);
+    // Gather selected tools
+    const selectedToolsArray = Array.from(
+      document.querySelectorAll('#tools input:checked')
+    ).map(cb => cb.value);
 
-      // Medkit validation
-      const medkitCount = selectedToolsArray.filter(tool => medkitKeywords.includes(tool)).length;
-      if (medkitCount > 1) {
-        alert("You can only have ONE medkit selected.");
-        return;
-      }
+    // Split medkits from other tools
+    const medkits = selectedToolsArray.filter(tool => medkitKeywords.includes(tool));
+    const otherTools = selectedToolsArray.filter(tool => !medkitKeywords.includes(tool));
 
-      if (!username || !serialId || !codename || !fullRank || !faceId || selectedToolsArray.length === 0) {
-        alert("Please fill out all fields and select at least one tool.");
-        return;
-      }
-
-      const armbandId = armbandIDs[rank];
-      const selectedTools = selectedToolsArray.join(',');
-
-      const command = `run permmorph ${username} remove & permshirt ${username} 16286681270 & permpants ${username} 7099968120 & permskin ${username} 125 125 125 & permhat ${username} 14438332755,14617421935,14449252277,14449179297,3860251635,14449406347 & permntag ${username} GRI.MODEL-v1.[${rank}].${serialId}:"${codename}" & permrtag ${username} [GRI] | [Maintenance and Logistics Department] <br/>[${fullRank}] & permhat ${username} ${armbandId} & startergear ${username} ${selectedTools} & permmaxhealth ${username} 120 & permface ${username} ${faceId}`;
-
-      document.getElementById("output").textContent = command;
+    // Validation: only 1 medkit allowed
+    if (medkits.length > 1) {
+      alert("You can only have ONE medkit selected.");
+      return;
     }
 
-    function copyCommand() {
-      const commandText = document.getElementById("output").textContent;
-      if (!commandText.trim()) {
-        alert("No command to copy. Please generate one first.");
-        return;
-      }
-      navigator.clipboard.writeText(commandText).then(() => {
-        alert("Command copied to clipboard!");
-      }).catch(() => {
-        alert("Failed to copy command.");
-      });
+    if (!username || !serialId || !codename || !fullRank || !faceId || selectedToolsArray.length === 0) {
+      alert("Please fill out all fields and select at least one tool.");
+      return;
     }
-  </script>
+
+    const armbandId = armbandIDs[rank];
+    const otherToolsString = otherTools.join(',');
+
+    // Base morph command
+    let command = `run permmorph ${username} remove & permshirt ${username} 16286681270 & permpants ${username} 7099968120 & permskin ${username} 125 125 125 & permhat ${username} 14438332755,14617421935,14449252277,14449179297,3860251635,14449406347 & permntag ${username} GRI.MODEL-v1.[${rank}].${serialId}:"${codename}" & permrtag ${username} [GRI] | [Maintenance and Logistics Department] <br/>[${fullRank}] & permhat ${username} ${armbandId} & permmaxhealth ${username} 120 & permface ${username} ${faceId}`;
+
+    // Add medkit as a separate startergear command (if selected)
+    if (medkits.length === 1) {
+      command += `\nstartergear ${username} ${medkits[0]}`;
+    }
+
+    // Add remaining tools as a single startergear command (if any left)
+    if (otherTools.length > 0) {
+      command += `\nstartergear ${username} ${otherToolsString}`;
+    }
+
+    document.getElementById("output").textContent = command;
+  }
+
+  function copyCommand() {
+    const commandText = document.getElementById("output").textContent;
+    if (!commandText.trim()) {
+      alert("No command to copy. Please generate one first.");
+      return;
+    }
+    navigator.clipboard.writeText(commandText).then(() => {
+      alert("Command copied to clipboard!");
+    }).catch(() => {
+      alert("Failed to copy command.");
+    });
+  }
+</script>
 </body>
 </html>
