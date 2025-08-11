@@ -63,6 +63,12 @@
       border-radius: 4px;
       overflow-x: auto;
     }
+    footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.85em;
+      color: #8b949e;
+    }
   </style>
 </head>
 <body>
@@ -128,9 +134,14 @@
   <input type="text" id="faceId" placeholder="Roblox face asset ID">
 
   <button onclick="generateCommand()">Generate Morph Command</button>
+  <button onclick="copyCommand()">Copy Command</button>
 
   <h2>Output Command:</h2>
   <pre id="output"></pre>
+
+  <footer>
+    <p>Created by <b>Choppovm</b> for Gaia Robotics International's Maintenance & Logistics Department | This project is open-source</p>
+  </footer>
 
   <script>
     const armbandIDs = {
@@ -141,6 +152,8 @@
       FL: "12813811334"
     };
 
+    const medkitKeywords = ["Medkit 5 Red", "Medkit 10 Red", "Medkit 10 Blue", "Medkit 10 White", "Medkit 10 Black"];
+
     function generateCommand() {
       const username = document.getElementById("username").value.trim();
       const rank = document.getElementById("rank").value;
@@ -150,20 +163,40 @@
       const faceId = document.getElementById("faceId").value.trim();
 
       // Gather selected tools
-      const selectedTools = Array.from(document.querySelectorAll('#tools input:checked'))
-        .map(cb => cb.value)
-        .join(',');
+      const selectedToolsArray = Array.from(document.querySelectorAll('#tools input:checked'))
+        .map(cb => cb.value);
 
-      if (!username || !serialId || !codename || !fullRank || !faceId || !selectedTools) {
+      // Medkit validation
+      const medkitCount = selectedToolsArray.filter(tool => medkitKeywords.includes(tool)).length;
+      if (medkitCount > 1) {
+        alert("You can only have ONE medkit selected.");
+        return;
+      }
+
+      if (!username || !serialId || !codename || !fullRank || !faceId || selectedToolsArray.length === 0) {
         alert("Please fill out all fields and select at least one tool.");
         return;
       }
 
       const armbandId = armbandIDs[rank];
+      const selectedTools = selectedToolsArray.join(',');
 
       const command = `run permmorph ${username} remove & permshirt ${username} 16286681270 & permpants ${username} 7099968120 & permskin ${username} 125 125 125 & permhat ${username} 14438332755,14617421935,14449252277,14449179297,3860251635,14449406347 & permntag ${username} GRI.MODEL-v1.[${rank}].${serialId}:"${codename}" & permrtag ${username} <font face="Jura"><b>[GRI] | <font color="#faa84c">[Maintenance and Logistics Department]</font></b> <br/><b>[${fullRank}]</b></font> & permhat ${username} ${armbandId} & startergear ${username} ${selectedTools} & permmaxhealth ${username} 120 & permface ${username} ${faceId}`;
 
       document.getElementById("output").textContent = command;
+    }
+
+    function copyCommand() {
+      const commandText = document.getElementById("output").textContent;
+      if (!commandText.trim()) {
+        alert("No command to copy. Please generate one first.");
+        return;
+      }
+      navigator.clipboard.writeText(commandText).then(() => {
+        alert("Command copied to clipboard!");
+      }).catch(() => {
+        alert("Failed to copy command.");
+      });
     }
   </script>
 </body>
