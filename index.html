@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>GRI Morph Command Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      color: #faa84c;
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      background: #161b22;
+      color: #e6edf3;
+      border: 1px solid #30363d;
+      border-radius: 4px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 15px;
+      background: #238636;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #2ea043;
+    }
+    pre {
+      background: #161b22;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>GRI Morph Command Generator</h1>
+
+  <label>Roblox Username:</label>
+  <input type="text" id="username" placeholder="Exact Roblox username">
+
+  <label>Rank:</label>
+  <select id="rank">
+    <option value="LR">LR</option>
+    <option value="MR">MR</option>
+    <option value="HR">HR</option>
+    <option value="HC">HC</option>
+    <option value="FL">FL</option>
+  </select>
+
+  <label>Serial ID:</label>
+  <input type="text" id="serialId" placeholder="e.g. 001">
+
+  <label>Codename:</label>
+  <input type="text" id="codename" placeholder="e.g. Sentinel">
+
+  <label>Full Rank (for permrtag):</label>
+  <input type="text" id="fullRank" placeholder="e.g. Logistics Operator">
+
+  <label>Tools (comma separated, no spaces):</label>
+  <input type="text" id="tools" placeholder="Glock17,L3Keycard,Radio,Medkit5red,Wrench">
+
+  <label>Face ID:</label>
+  <input type="text" id="faceId" placeholder="Roblox face asset ID">
+
+  <button onclick="generateCommand()">Generate Morph Command</button>
+
+  <h2>Output Command:</h2>
+  <pre id="output"></pre>
+
+  <script>
+    const armbandIDs = {
+      LR: "12813802758",
+      MR: "12813781831",
+      HR: "12813815111",
+      HC: "12813811334",
+      FL: "12813811334" // Using HC armband for FL if needed
+    };
+
+    function generateCommand() {
+      const username = document.getElementById("username").value.trim();
+      const rank = document.getElementById("rank").value;
+      const serialId = document.getElementById("serialId").value.trim();
+      const codename = document.getElementById("codename").value.trim();
+      const fullRank = document.getElementById("fullRank").value.trim();
+      const tools = document.getElementById("tools").value.trim();
+      const faceId = document.getElementById("faceId").value.trim();
+
+      if (!username || !serialId || !codename || !fullRank || !tools || !faceId) {
+        alert("Please fill out all fields.");
+        return;
+      }
+
+      const armbandId = armbandIDs[rank];
+
+      const command = `run permmorph ${username} remove & permshirt ${username} 16286681270 & permpants ${username} 7099968120 & permskin ${username} 125 125 125 & permhat ${username} 14438332755,14617421935,14449252277,14449179297,3860251635,14449406347 & permntag ${username} GRI.MODEL-v1.[${rank}].${serialId}:"${codename}" & permrtag ${username} <font face="Jura"><b>[GRI] | <font color="#faa84c">[Maintenance and Logistics Department]</font></b> <br/><b>[${fullRank}]</b></font> & permhat ${username} ${armbandId} & startergear ${username} ${tools} & permmaxhealth ${username} 120 & permface ${username} ${faceId}`;
+
+      document.getElementById("output").textContent = command;
+    }
+  </script>
+</body>
+</html>
