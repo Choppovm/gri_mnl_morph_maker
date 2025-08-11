@@ -183,7 +183,7 @@
       const armbandId = armbandIDs[rank];
       const selectedTools = selectedToolsArray.join(',');
 
-      const command = `run permmorph ${username} remove & permshirt ${username} 16286681270 & permpants ${username} 7099968120 & permskin ${username} 125 125 125 & permhat ${username} 14438332755,14617421935,14449252277,14449179297,3860251635,14449406347 & permntag ${username} GRI.MODEL-v1.[${rank}].${serialId}:"${codename}" & permrtag ${username} <font face="Jura"><b>[GRI] | <font color="#faa84c">[Maintenance and Logistics Department]</font></b> <br/><b>[${fullRank}]</b></font> & permhat ${username} ${armbandId} & startergear ${username} ${selectedTools} & permmaxhealth ${username} 120 & permface ${username} ${faceId}`;
+      const command = `run permmorph ${username} remove & permshirt ${username} 16286681270 & permpants ${username} 7099968120 & permskin ${username} 125 125 125 & permhat ${username} 14438332755,14617421935,14449252277,14449179297,3860251635,14449406347 & permntag ${username} GRI.MODEL-v1.[${rank}].${serialId}:"${codename}" & permrtag ${username} [GRI] | [Maintenance and Logistics Department] <br/>[${fullRank}] & permhat ${username} ${armbandId} & startergear ${username} ${selectedTools} & permmaxhealth ${username} 120 & permface ${username} ${faceId}`;
 
       document.getElementById("output").textContent = command;
     }
