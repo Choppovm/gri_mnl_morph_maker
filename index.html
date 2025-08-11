@@ -163,51 +163,45 @@
   ];
 
   function generateCommand() {
-    const username = document.getElementById("username").value.trim();
-    const rank = document.getElementById("rank").value;
-    const serialId = document.getElementById("serialId").value.trim();
-    const codename = document.getElementById("codename").value.trim();
-    const fullRank = document.getElementById("fullRank").value;
-    const faceId = document.getElementById("faceId").value.trim();
+  const username = document.getElementById("username").value.trim();
+  const rank = document.getElementById("rank").value;
+  const serialId = document.getElementById("serialId").value.trim();
+  const codename = document.getElementById("codename").value.trim();
+  const fullRank = document.getElementById("fullRank").value;
+  const faceId = document.getElementById("faceId").value.trim();
 
-    // Gather selected tools
-    const selectedToolsArray = Array.from(
-      document.querySelectorAll('#tools input:checked')
-    ).map(cb => cb.value);
+  // Gather selected tools
+  const selectedToolsArray = Array.from(document.querySelectorAll('#tools input:checked'))
+    .map(cb => cb.value);
 
-    // Split medkits from other tools
-    const medkits = selectedToolsArray.filter(tool => medkitKeywords.includes(tool));
-    const otherTools = selectedToolsArray.filter(tool => !medkitKeywords.includes(tool));
-
-    // Validation: only 1 medkit allowed
-    if (medkits.length > 1) {
-      alert("You can only have ONE medkit selected.");
-      return;
-    }
-
-    if (!username || !serialId || !codename || !fullRank || !faceId || selectedToolsArray.length === 0) {
-      alert("Please fill out all fields and select at least one tool.");
-      return;
-    }
-
-    const armbandId = armbandIDs[rank];
-    const otherToolsString = otherTools.join(',');
-
-    // Base morph command
-    let command = `run permmorph ${username} remove & permshirt ${username} 16286681270 & permpants ${username} 7099968120 & permskin ${username} 125 125 125 & permhat ${username} 14438332755,14617421935,14449252277,14449179297,3860251635,14449406347 & permntag ${username} GRI.MODEL-v1.[${rank}].${serialId}:"${codename}" & permrtag ${username} [GRI] | [Maintenance and Logistics Department] <br/>[${fullRank}] & permhat ${username} ${armbandId} & permmaxhealth ${username} 120 & permface ${username} ${faceId}`;
-
-    // Add medkit as a separate startergear command (if selected)
-    if (medkits.length === 1) {
-      command += `\nstartergear ${username} ${medkits[0]}`;
-    }
-
-    // Add remaining tools as a single startergear command (if any left)
-    if (otherTools.length > 0) {
-      command += `\nstartergear ${username} ${otherToolsString}`;
-    }
-
-    document.getElementById("output").textContent = command;
+  // Medkit validation
+  const medkits = selectedToolsArray.filter(tool => medkitKeywords.includes(tool));
+  if (medkits.length > 1) {
+    alert("You can only have ONE medkit selected.");
+    return;
   }
+
+  if (!username || !serialId || !codename || !fullRank || !faceId || selectedToolsArray.length === 0) {
+    alert("Please fill out all fields and select at least one tool.");
+    return;
+  }
+
+  const armbandId = armbandIDs[rank];
+  const nonMedkitTools = selectedToolsArray.filter(tool => !medkitKeywords.includes(tool));
+
+  // Build startergear parts separately
+  let startergearParts = [];
+  if (nonMedkitTools.length > 0) {
+    startergearParts.push(`startergear ${username} ${nonMedkitTools.join(',')}`);
+  }
+  if (medkits.length > 0) {
+    startergearParts.push(`startergear ${username} ${medkits[0]}`);
+  }
+
+  const command = `run permmorph ${username} remove & permshirt ${username} 16286681270 & permpants ${username} 7099968120 & permskin ${username} 125 125 125 & permhat ${username} 14438332755,14617421935,14449252277,14449179297,3860251635,14449406347 & permntag ${username} GRI.MODEL-v1.[${rank}].${serialId}:"${codename}" & permrtag ${username} [GRI] | [Maintenance and Logistics Department] <br/>[${fullRank}] & permhat ${username} ${armbandId} & ${startergearParts.join(' & ')} & permmaxhealth ${username} 120 & permface ${username} ${faceId}`;
+
+  document.getElementById("output").textContent = command;
+}
 
   function copyCommand() {
     const commandText = document.getElementById("output").textContent;
